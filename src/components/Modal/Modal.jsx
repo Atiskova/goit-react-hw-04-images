@@ -1,32 +1,31 @@
-import { Component } from 'react';
+import { useEffect } from 'react';
 import { Overlay, ModalContent } from './Modal.styled';
 
-export class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
+export const Modal = ({ onClose, children }) => {
+ 
+  useEffect(() => {
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
+    const handleKeyDown = e => {
+      if (e.code === 'Escape') onClose();
+    };
 
-  handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      this.props.onClose();
-    }
-  };
+    window.addEventListener('keydown', handleKeyDown);
 
-  handleBackdropClick = event => {
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+
+  }, [onClose])
+
+  const handleBackdropClick = event => {
     if (event.currentTarget !== event.target) {
-      this.props.onClose();
+      onClose();
     }
   };
 
-  render() {
-    return (
-      <Overlay onClick={this.handleBackdropClick}>
-        <ModalContent>{this.props.children}</ModalContent>
-      </Overlay>
-    );
-  }
-}
+  return (
+    <Overlay onClick={handleBackdropClick}>
+      <ModalContent>{children}</ModalContent>
+    </Overlay>
+  );
+};
